@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     # ── OpenAI ───────────────────────────────
     openai_api_key: str
     openai_model: str = "gpt-4o-mini"
+    openai_base_url: str | None = None
 
     # ── Pipeline ─────────────────────────────
     max_audio_duration_seconds: int = 7200

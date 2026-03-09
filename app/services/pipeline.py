@@ -114,7 +114,18 @@ class PipelineOrchestrator:
 
             # ── Step 4: Integrations & Data Fusion deep-analysis ─
             log.info("pipeline_step", step="analyzing", meeting_id=meeting_id)
-            repo.update_meeting(meeting_id, {"status": "analyzing"})
+            # Some existing databases may still enforce an older status check
+            # that does not include "analyzing". Fall back to "extracting".
+            try:
+                repo.update_meeting(meeting_id, {"status": "analyzing"})
+            except Exception:
+                log.warning(
+                    "status_fallback",
+                    meeting_id=meeting_id,
+                    requested_status="analyzing",
+                    fallback_status="extracting",
+                )
+                repo.update_meeting(meeting_id, {"status": "extracting"})
 
             # Collect events by type; also promote events whose *intent* was
             # classified as integrations/data_fusion even if the raw event_type differs.

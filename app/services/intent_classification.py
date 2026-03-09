@@ -43,7 +43,11 @@ class IntentClassificationService:
 
     def __init__(self) -> None:
         settings = get_settings()
-        self._client = OpenAI(api_key=settings.openai_api_key)
+        base_url = settings.openai_base_url
+        # OpenRouter keys typically start with sk-or-v1 and need OpenRouter base URL.
+        if not base_url and settings.openai_api_key.startswith("sk-or-v1"):
+            base_url = "https://openrouter.ai/api/v1"
+        self._client = OpenAI(api_key=settings.openai_api_key, base_url=base_url)
         self._model = settings.openai_model
 
     async def classify(self, events: list[ExtractedEvent]) -> list[ClassifiedIntent]:
